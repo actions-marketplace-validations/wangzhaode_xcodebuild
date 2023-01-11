@@ -12802,7 +12802,7 @@ async function getDestination(xcodeVersion, platform) {
         case 'iOS':
             return [
                 '-destination',
-                'id=dvtdevice-DVTiPhonePlaceholder-iphoneos:placeholder',
+                'platform=iOS,id=dvtdevice-DVTiPhonePlaceholder-iphoneos:placeholder,name=Any iOS Device',
             ];
         case 'tvOS':
         case 'watchOS': {
