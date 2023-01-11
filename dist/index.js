@@ -12800,6 +12800,10 @@ exports.actionIsTestable = actionIsTestable;
 async function getDestination(xcodeVersion, platform) {
     switch (platform) {
         case 'iOS':
+            return [
+                '-destination',
+                'id=dvtdevice-DVTiPhonePlaceholder-iphoneos:placeholder',
+            ];
         case 'tvOS':
         case 'watchOS': {
             const id = (await destinations())[platform];

@@ -319,6 +319,10 @@ export async function getDestination(
 ): Promise<string[]> {
   switch (platform) {
     case 'iOS':
+      return [
+        '-destination',
+        'id=dvtdevice-DVTiPhonePlaceholder-iphoneos:placeholder',
+      ]
     case 'tvOS':
     case 'watchOS': {
       const id = (await destinations())[platform]
