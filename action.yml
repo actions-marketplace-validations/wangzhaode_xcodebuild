@@ -119,9 +119,9 @@ inputs:
       Beware that artifacts count against your GitHub Actions storage limits.
     default: on-failure
     required: false
-  derivedDataPath:
+  symroot:
     description: |
-      Overrides the folder that should be used for derived data.
+      Product and build files are placed in subdirectories of this directory.
     required: false
 runs:
   using: 'node16'

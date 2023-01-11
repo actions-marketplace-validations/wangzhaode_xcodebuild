@@ -45,7 +45,7 @@ async function main() {
   const identity = getIdentity(core.getInput('code-sign-identity'), platform)
   const xcpretty = verbosity() == 'xcpretty'
   const workspace = core.getInput('workspace')
-  const derivedDataPath = core.getInput('derivedDataPath')
+  const symroot = core.getInput('symroot')
 
   core.info(`» Selected Xcode ${selected}`)
 
@@ -59,7 +59,7 @@ async function main() {
   await configureKeychain()
   await configureProvisioningProfiles()
 
-  await build(await getScheme(workspace), workspace, derivedDataPath)
+  await build(await getScheme(workspace), workspace, symroot)
 
   if (core.getInput('upload-logs') == 'always') {
     await uploadLogs()
@@ -180,15 +180,11 @@ async function main() {
     await createProvisioningProfiles(profiles, mobileProfiles)
   }
 
-  async function build(
-    scheme?: string,
-    workspace?: string,
-    derivedDataPath?: string
-  ) {
+  async function build(scheme?: string, workspace?: string, symroot?: string) {
     if (warningsAsErrors && actionIsTestable(action)) {
-      await xcodebuild('build', scheme, workspace, derivedDataPath)
+      await xcodebuild('build', scheme, workspace, symroot)
     }
-    await xcodebuild(action, scheme, workspace, derivedDataPath)
+    await xcodebuild(action, scheme, workspace, symroot)
   }
 
   //// helper funcs
@@ -197,7 +193,7 @@ async function main() {
     action?: string,
     scheme?: string,
     workspace?: string,
-    derivedDataPath?: string
+    symroot?: string
   ) {
     if (action === 'none') return
 
@@ -210,8 +206,6 @@ async function main() {
       if (verbosity() == 'quiet') args.push('-quiet')
       if (configuration) args = args.concat(['-configuration', configuration])
       if (apiKey) args = args.concat(apiKey)
-      if (derivedDataPath)
-        args = args.concat(['-derivedDataPath', derivedDataPath])
 
       args = args.concat([
         '-resultBundlePath',
@@ -231,7 +225,7 @@ async function main() {
       }
 
       if (action) args.push(action)
-
+      if (symroot) args = args.concat(`SYMROOT=${symroot}`)
       await xcodebuildX(args, xcpretty)
     })
   }

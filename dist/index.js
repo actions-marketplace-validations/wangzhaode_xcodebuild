@@ -12281,6 +12281,7 @@ async function main() {
     const identity = (0, lib_1.getIdentity)(core.getInput('code-sign-identity'), platform);
     const xcpretty = (0, lib_1.verbosity)() == 'xcpretty';
     const workspace = core.getInput('workspace');
+    const symroot = core.getInput('symroot');
     core.info(`» Selected Xcode ${selected}`);
     const reason = shouldGenerateXcodeproj();
     if (reason) {
@@ -12289,7 +12290,7 @@ async function main() {
     const apiKey = await getAppStoreConnectApiKey();
     await configureKeychain();
     await configureProvisioningProfiles();
-    await build(await getScheme(workspace), workspace);
+    await build(await getScheme(workspace), workspace, symroot);
     if (core.getInput('upload-logs') == 'always') {
         await uploadLogs();
     }
@@ -12392,14 +12393,14 @@ async function main() {
             return;
         await (0, lib_1.createProvisioningProfiles)(profiles, mobileProfiles);
     }
-    async function build(scheme, workspace) {
+    async function build(scheme, workspace, symroot) {
         if (warningsAsErrors && (0, lib_1.actionIsTestable)(action)) {
-            await xcodebuild('build', scheme, workspace);
+            await xcodebuild('build', scheme, workspace, symroot);
         }
-        await xcodebuild(action, scheme, workspace);
+        await xcodebuild(action, scheme, workspace, symroot);
     }
     //// helper funcs
-    async function xcodebuild(action, scheme, workspace) {
+    async function xcodebuild(action, scheme, workspace, symroot) {
         if (action === 'none')
             return;
         const title = ['xcodebuild', action].filter((x) => x).join(' ');
@@ -12435,6 +12436,8 @@ async function main() {
             }
             if (action)
                 args.push(action);
+            if (symroot)
+                args = args.concat(`SYMROOT=${symroot}`);
             await (0, xcodebuild_1.default)(args, xcpretty);
         });
     }
